@@ -9,8 +9,8 @@ For the complete methodology and analysis, refer to [the final report](CS289-Fin
 ## Structure
 ### Code
 + **dataprocessing.py** contains functions used to import and clean the full data, including subsetting of survey responses by category and initial cleaning, imputation, and transformation for model training and fitting
-+ **fitting.py** contains functions for fitting random forests and AdaBoost classifiers to each subset of survey responses, along with hyperparameter selection using k-fold cross validation
-+ **experimental.py** is a script used to generate the outputs using the functions of *dataprocessing* and *fitting*. 
++ **fitting.py** contains code for fitting random forests and AdaBoost classifiers to each subset of survey responses, along with hyperparameter selection using k-fold cross validation
+
 
 ### Data
 + This subrepository contains the raw ANES election data in various formats. The *csv* format was used in data importing for *dataprocessing.py*. 
