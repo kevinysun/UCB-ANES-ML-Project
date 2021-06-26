@@ -47,7 +47,7 @@ def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
 
     df_imputed = scaler.inverse_transform(df_imputed)
     df_imputed = pd.DataFrame(df_imputed, columns = df.columns)
-    # knn imputer gives decimals, so we round to integers
+
     # ISSUE: continuous columns?
     # Approach: we will pass a list of column names to ignore
     # create df_cat which drops non-categorical
@@ -56,7 +56,7 @@ def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
     else:
         df_cat = df_imputed.drop(cont, axis=1) 
 
-    #cat_vars = df_cat.columns
+    # knn imputer gives decimals, so we round to integers
     df_cat = np.round(df_cat).astype(np.int32)
 
     if cont:
