@@ -1,4 +1,3 @@
-#import pyreadstat as prs
 import numpy as np
 import pandas as pd
 import scipy as sp
@@ -12,6 +11,11 @@ from sklearn.preprocessing import MinMaxScaler
 
 def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
     """
+    Take subsetted ANES features and labels and process them for random forest training
+    Includes: missing value imputation and one-hot encoding. One-hot encoding is only for
+    categorical variables - continuous variables can be specified and ignored
+
+    ARGUMENTS
     df: pandas dataframe
     drop_thresh: proportion of missing values threshold, if over this we drop the row
     cont: list of continuous variables to not use one-hot encoding with
@@ -46,7 +50,7 @@ def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
     df_imputed = pd.DataFrame(df_imputed, columns = df.columns)
     # knn imputer gives decimals, so we round to integers
     # ISSUE: continuous columns?
-    # we will pass a list of column names so just ignore those
+    # Approach: we will pass a list of column names to ignore
     # create df_cat which drops non-categorical
     if not cont:
         df_cat = df_imputed.copy()
