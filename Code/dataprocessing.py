@@ -83,8 +83,8 @@ def load_data():
     also returns feature info (question id and description)
     '''
     # filter only by those who have voted for R or D
-    data = pd.read_csv("Data/anes_timeseries_2016.csv", low_memory=False)
-    featureinfo = pd.read_csv("Codebook/anes_timeseries_2016_varlist.csv")
+    data = pd.read_csv("../Data/anes_timeseries_2016.csv", low_memory=False)
+    featureinfo = pd.read_csv("../Codebook/anes_timeseries_2016_varlist.csv")
     # methodology = pd.read_csv("data/anes_timeseries_2016_methodology.csv")
     data = data[data["V162034a"].isin([1,2])]
     y = data["V162034a"]
