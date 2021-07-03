@@ -42,26 +42,26 @@ def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
     imputer = KNNImputer(n_neighbors=10, weights='uniform')
 
 
-    df_imputed = pd.DataFrame(imputer.fit_transform(df),
+    df = pd.DataFrame(imputer.fit_transform(df),
                                     columns = df.columns)
     #rescale
 
-    df_imputed = scaler.inverse_transform(df_imputed)
-    df_imputed = pd.DataFrame(df_imputed, columns = df.columns)
+    df = scaler.inverse_transform(df)
+    df = pd.DataFrame(df, columns = df.columns)
     # knn imputer gives decimals, so we round to integers
     # ISSUE: continuous columns?
     # Approach: we will pass a list of column names to ignore
     # create df_cat which drops non-categorical
     if not cont:
-        df_cat = df_imputed.copy()
+        df_cat = df.copy()
     else:
-        df_cat = df_imputed.drop(cont, axis=1) 
+        df_cat = df.drop(cont, axis=1) 
 
     #cat_vars = df_cat.columns
     df_cat = np.round(df_cat).astype(np.int32)
 
     if cont:
-        df_cont = df_imputed[cont].to_numpy()
+        df_cont = df[cont].to_numpy()
     
     #one-hot encoding
     encoder = OneHotEncoder()
@@ -69,11 +69,11 @@ def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
     df_enc = encoder.transform(df_cat).A
 
     if not cont:
-        df_prepared = df_enc
+        df = df_enc
     else:
-        df_prepared = np.hstack((df_cont, df_enc))
+        df = np.hstack((df_cont, df_enc))
 
-    return df_prepared, encoder, y_out
+    return df, encoder, y_out
 
 
 def load_data():
