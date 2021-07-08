@@ -9,7 +9,7 @@ from sklearn.impute import KNNImputer
 from sklearn.preprocessing import MinMaxScaler
 
 
-def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
+def fit_prepare(data, labels, drop_thresh = 0.4, cont = [], fitencoder = None):
     """
     Take subsetted ANES features and labels and process them for random forest training
     Includes: missing value imputation and one-hot encoding. One-hot encoding is only for
@@ -17,15 +17,22 @@ def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
 
     ARGUMENTS
     df: pandas dataframe
+    labels: y values to process along with data (drop corresponding observations if too many
+        missing values)
     drop_thresh: proportion of missing values threshold, if over this we drop the row
     cont: list of continuous variables to not use one-hot encoding with
-    y: labels
-    outputs: encoded ndarray to fit on
+    fitencoder: encoder from training data (if using on test data)
+
+
+    OUTPUTS
+    df: encoded ndarray to fit on
+    encoder: encoder to reuse on test data
+    y_out: labels
 
 
     ISSUE: need to somehow be able to identify columns
     """
-    df = data.copy()
+    df = data.copy(deep = True)
     pshape = df.shape
     df.insert(0, "y", labels.values)
     df = (df.mask(df < 0, np.nan)
@@ -46,8 +53,8 @@ def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
                                     columns = df.columns)
     #rescale
 
-    df = scaler.inverse_transform(df)
-    df = pd.DataFrame(df, columns = df.columns)
+    df_imputed = scaler.inverse_transform(df)
+    df = pd.DataFrame(df_imputed, columns = df.columns)
     # knn imputer gives decimals, so we round to integers
     # ISSUE: continuous columns?
     # Approach: we will pass a list of column names to ignore
@@ -64,9 +71,17 @@ def fit_prepare(data, labels, drop_thresh = 0.4, cont = []):
         df_cont = df[cont].to_numpy()
     
     #one-hot encoding
-    encoder = OneHotEncoder()
-    encoder.fit(df_cat)
-    df_enc = encoder.transform(df_cat).A
+    if fitencoder is None:
+        # we are on the training data, need to fit an encoder
+        encoder = OneHotEncoder(handle_unknown="ignore")
+        encoder.fit(df_cat)
+        df_enc = encoder.transform(df_cat).A
+    else:
+        # we are on the test data, use previous encoder to ensure that dimensions line up
+        encoder = fitencoder
+        df_enc = fitencoder.transform(df_cat).A
+
+
 
     if not cont:
         df = df_enc

@@ -31,7 +31,7 @@ topics = ['community', 'gender', 'healthcare/science', 'intl relations', 'nation
             'miscellaneous', 'personality/values', 'political system', 'race', 'social/financial']
 scores = []
 
-
+"""
 #---------------TESTING-----------------------------------
 #Initial fit, one-hot encoding, default RandomForest, no subset selection, single train-test-split
 #random state 42
@@ -63,7 +63,7 @@ for fn in subset_fns:
     #yposterior = model.predict_proba(X_test)
     scores.append(model.score(X_test, y_test))
 
-
+"""
 
 #----------------MODEL SELECTION----------------------------------
 ###### HYPERPARAMETER TUNING 
@@ -72,6 +72,7 @@ for fn in subset_fns:
 bestparamslistrf = []
 scoresrf = []
 rfmodels = []
+encoders = []
 # tune each tree
 for fn in subset_fns:
     sub_data, sub_features, sub_cont = fn(X_model, featureinfo)
@@ -84,6 +85,7 @@ for fn in subset_fns:
     tuner = GridSearchCV(estimator = model, param_grid = params)
     tuner.fit(X_prepared, y_prep)
     
+    encoders.append(encoder)
     rfmodels.append(tuner)
     bestparamslistrf.append(tuner.best_params_)
     scoresrf.append(tuner.best_score_)
@@ -219,7 +221,8 @@ for index, fn in enumerate(subset_fns):
     eval_data, __, eval_cont = fn(X_eval, featureinfo)
 
     X_modeleval, __, y_modeleval = fit_prepare(data = eval_data, 
-                                                labels = y_eval, cont = eval_cont)
+                                                labels = y_eval, cont = eval_cont,
+                                                fitencoder = encoders[index])
 
 
     # grab corresponding model
